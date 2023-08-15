@@ -11,7 +11,7 @@ public class GameBoard implements Serializable {
     public static final Font tileFont = new Font("Dialog", Font.BOLD, 16);
     public static final Font smallTileFont = new Font("Dialog", Font.BOLD, 14);
     public static final Font mineFont = new Font("Dialog", Font.BOLD, 22);
-    public static final Font menuFont = new Font("Dialog", Font.BOLD, 32);
+    public static final Font menuFont = new Font("Dialog", Font.BOLD, 40);
     public static final Color unrevealedColor = new Color(180, 180, 180, 255);
     public static final Color revealedColor = new Color(150, 150, 150, 255);
     public static final Color saveLoadColor = new Color(40, 40, 40);
@@ -30,7 +30,7 @@ public class GameBoard implements Serializable {
     private int difficulty;
     private String mode;
     private boolean firstClick;
-    private int worldsGenerated = 0;
+    private int testingNum = 0;
     private boolean saved;
     public class Tile implements Serializable {
         private int x;
@@ -108,6 +108,7 @@ public class GameBoard implements Serializable {
                 }
                 mPressed = false;
             }
+            StdDraw.pause(5);
         }
     }
     public void renderMainMenu() {
@@ -117,9 +118,17 @@ public class GameBoard implements Serializable {
         StdDraw.filledRectangle(30, 15, 5, 1);
         StdDraw.filledRectangle(30, 12, 5, 1);
         StdDraw.setPenColor(Color.BLACK);
+        StdDraw.setFont(menuFont);
+        StdDraw.text(30, 24, "Minesweeper Plus");
+        StdDraw.setFont(tileFont);
         StdDraw.text(30, 18, "Difficulty: " + difficultyList[difficulty]);
         StdDraw.text(30, 15, "View: " + mode);
         StdDraw.text(30, 12, "Start Game");
+        StdDraw.setFont(mineFont);
+        for (int i = 0; i < difficulty + 1; i++) {
+            StdDraw.text(36 + i, 17.88, "\u26EF");
+            StdDraw.filledCircle(36 + i, 18, 0.25);
+        }
         StdDraw.show();
     }
     public void runGame(int w, int h, int m) {
@@ -128,13 +137,14 @@ public class GameBoard implements Serializable {
         boolean mPressed = false;
         gameOver = false;
         firstClick = true;
-        worldsGenerated = 0;
+        testingNum = 0;
         revealedTotal = 0;
         minesMarked = 0;
         drawBoard();
         header();
         StdDraw.show();
         while (!gameOver) {
+            testingNum++;
             if (StdDraw.isMousePressed()) {
                 mPressed = true;
             } else {
@@ -169,6 +179,7 @@ public class GameBoard implements Serializable {
                 }
                 mPressed = false;
             }
+            StdDraw.pause(5);
         }
         if (revealedTotal + minesTotal == width * height) {
             wonGame();
@@ -193,7 +204,7 @@ public class GameBoard implements Serializable {
         } else {
             StdDraw.text(width - 5.5, height + 0.4, "Save*");
         }
-        //StdDraw.textLeft(8, height + 0.4, "" + revealedTotal);
+        //StdDraw.textLeft(8, height + 0.4, "" + testingNum);
     }
     public void saveGame() {
         if (!this.saved) {
@@ -218,7 +229,7 @@ public class GameBoard implements Serializable {
         this.difficulty = loaded.difficulty;
         this.mode = loaded.mode;
         this.firstClick = loaded.firstClick;
-        this.worldsGenerated = loaded.worldsGenerated;
+        this.testingNum = loaded.testingNum;
         initialize(width, height, minesTotal);
         drawBoard();
         header();
@@ -251,6 +262,7 @@ public class GameBoard implements Serializable {
                 }
                 mPressed = false;
             }
+            StdDraw.pause(5);
         }
     }
     public void showSolution() {
@@ -294,6 +306,7 @@ public class GameBoard implements Serializable {
                     mPressed = false;
                 }
             }
+            StdDraw.pause(5);
         }
     }
     public void wonGame() {
@@ -321,6 +334,7 @@ public class GameBoard implements Serializable {
                     mPressed = false;
                 }
             }
+            StdDraw.pause(5);
         }
     }
     public void initialize(int w, int h, int m) {
@@ -411,7 +425,6 @@ public class GameBoard implements Serializable {
             if (countMines(x, y) == 0) {
                 success = true;
             }
-            worldsGenerated++;
         }
         firstClick = false;
     }

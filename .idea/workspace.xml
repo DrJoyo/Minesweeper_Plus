@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ad95a9f9-0b94-4ecc-9a4d-03591e166f41" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/StdDraw.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Utils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Minesweeper.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Minesweeper.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MinesweeperSaved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/MinesweeperSaved.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameBoard.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Tile.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
