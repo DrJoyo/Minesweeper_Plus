@@ -1,17 +1,24 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GameBoard {
+public class GameBoard implements Serializable {
     public static final int TILE_SIZE = 20;
     public static final Font tileFont = new Font("Dialog", Font.BOLD, 16);
     public static final Font smallTileFont = new Font("Dialog", Font.BOLD, 14);
     public static final Font mineFont = new Font("Dialog", Font.BOLD, 22);
+    public static final Font menuFont = new Font("Dialog", Font.BOLD, 32);
     public static final Color unrevealedColor = new Color(180, 180, 180, 255);
     public static final Color revealedColor = new Color(150, 150, 150, 255);
+    public static final Color saveLoadColor = new Color(40, 40, 40);
+    public static final Color loseColor = new Color(255, 0, 0, 50);
     public static final Color[] colorList = {Color.BLUE, new Color(0, 100, 0), Color.RED, new Color(0, 0, 80), new Color(80, 0, 0), new Color(0, 110, 110), Color.BLACK, Color.GRAY, new Color(64, 0, 128)};
+    private static final String[] difficultyList = {"Easy", "Medium", "Hard", "Extreme"};
+    public static final File SAVEFILE = Utils.join(new File(System.getProperty("user.dir")), "MinesweeperSaved.txt");
     private int width;
     private int height;
     private int minesMarked;
@@ -21,11 +28,11 @@ public class GameBoard {
     Tile[][] board;
     private boolean gameOver;
     private int difficulty;
-    private String[] difficultyList = {"Easy", "Medium", "Hard", "Extreme"};
     private String mode;
     private boolean firstClick;
     private int worldsGenerated = 0;
-    public class Tile {
+    private boolean saved;
+    public class Tile implements Serializable {
         private int x;
         private int y;
         private boolean mine;
@@ -67,11 +74,10 @@ public class GameBoard {
                     if (mouseInBox(30, 18, 5, 1)) {
                         difficulty = (difficulty + 1) % 4;
                         renderMainMenu();
-                    }
-                    else if (mouseInBox(30, 15, 5, 1)) {
-                        if (mode == "Normal") {
+                    } else if (mouseInBox(30, 15, 5, 1)) {
+                        if (mode.equals("Normal")) {
                             mode = "Far";
-                        } else if (mode == "Far") {
+                        } else if (mode.equals("Far")) {
                             mode = "Normal";
                         }
                         renderMainMenu();
@@ -94,7 +100,9 @@ public class GameBoard {
                             h = 30;
                             m = 300;
                         }
-                        m = m * 3 / 4;
+                        if (mode.equals("Far")) {
+                            m = m * 3 / 4;
+                        }
                         runGame(w, h, m);
                     }
                 }
@@ -133,15 +141,27 @@ public class GameBoard {
                 if (mPressed) {
                     int x = (int) StdDraw.mouseX();
                     int y = (int) StdDraw.mouseY();
-                    if (StdDraw.isKeyPressed(KeyEvent.VK_SPACE)) {
-                        invertTile(x, y);
-                    } else {
-                        if (firstClick) {
-                            safeFirstClick(x, y);
+                    if (y < height) {
+                        if (StdDraw.isKeyPressed(KeyEvent.VK_SPACE)) {
+                            if (invertTile(x, y)) {
+                                this.saved = false;
+                            }
+                        } else {
+                            if (firstClick) {
+                                safeFirstClick(x, y);
+                            }
+                            if (revealTile(x, y, true)) {
+                                this.saved = false;
+                            }
+                            if (revealedTotal + minesTotal == width * height) {
+                                gameOver = true;
+                            }
                         }
-                        revealTile(x, y, true);
-                        if (revealedTotal + minesTotal == width * height) {
-                            gameOver = true;
+                    } else {
+                        if (mouseInBox(width - 5.5, height + 0.5, 1.5, 0.5)) {
+                            saveGame();
+                        } else if (mouseInBox(width - 1.5, height + 0.5, 1.5, 0.5)) {
+                            loadGame();
                         }
                     }
                     header();
@@ -153,42 +173,125 @@ public class GameBoard {
         if (revealedTotal + minesTotal == width * height) {
             wonGame();
         } else {
-            showSolution();
+            lostGame();
         }
+        mainMenu();
+    }
+    public void header() {
+        StdDraw.setPenColor(Color.DARK_GRAY);
+        StdDraw.filledRectangle(width / 2, height + 0.5, width / 2, 0.5);
+        StdDraw.setPenColor(saveLoadColor);
+        StdDraw.filledRectangle(width - 1.5, height + 0.5, 1.5, 0.5);
+        StdDraw.filledRectangle(width - 5.5, height + 0.5, 1.5, 0.5);
+        drawMine(0, height);
+        StdDraw.setFont(tileFont);
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.textLeft(1, height + 0.4, "" + (minesTotal - minesMarked));
+        StdDraw.text(width - 1.5, height + 0.4, "Load");
+        if (saved) {
+            StdDraw.text(width - 5.5, height + 0.4, "Save");
+        } else {
+            StdDraw.text(width - 5.5, height + 0.4, "Save*");
+        }
+        //StdDraw.textLeft(8, height + 0.4, "" + revealedTotal);
+    }
+    public void saveGame() {
+        if (!this.saved) {
+            Utils.writeObject(SAVEFILE, this);
+            this.saved = true;
+        }
+    }
+    public void loadGame() {
+        try {
+            GameBoard loaded = Utils.readObject(SAVEFILE, GameBoard.class);
+        } catch (Exception e) {
+            return;
+        }
+        GameBoard loaded = Utils.readObject(SAVEFILE, GameBoard.class);
+        this.width = loaded.width;
+        this.height = loaded.height;
+        this.minesMarked = loaded.minesMarked;
+        this.minesTotal = loaded.minesTotal;
+        this.revealedTotal = loaded.revealedTotal;
+        this.board = loaded.board;
+        this.gameOver = loaded.gameOver;
+        this.difficulty = loaded.difficulty;
+        this.mode = loaded.mode;
+        this.firstClick = loaded.firstClick;
+        this.worldsGenerated = loaded.worldsGenerated;
+        initialize(width, height, minesTotal);
+        drawBoard();
+        header();
         StdDraw.show();
+    }
+    public void lostGame() {
+        StdDraw.clear(loseColor);
+        StdDraw.setPenColor(Color.DARK_GRAY);
+        StdDraw.filledRectangle(width / 2, height / 2 + 1, 4, 0.5);
+        StdDraw.filledRectangle(width / 2, height / 2 - 1, 4, 0.5);
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.setFont(tileFont);
+        StdDraw.text(width / 2, height / 2 + 0.9, "Main Menu");
+        StdDraw.text(width / 2, height / 2 - 1.1, "Solution");
+        StdDraw.setFont(menuFont);
+        StdDraw.text(width / 2, height / 2 + 3.4, "Game Over");
+        StdDraw.show();
+        boolean mPressed = false;
         while (true) {
             if (StdDraw.isMousePressed()) {
                 mPressed = true;
             } else {
                 if (mPressed) {
-                    mainMenu();
-                } else {
-                    mPressed = false;
+                    if (mouseInBox(width / 2, height / 2 + 1, 4, 0.5)) {
+                        return;
+                    } else if (mouseInBox(width / 2, height / 2 - 1, 4, 0.5)) {
+                        showSolution();
+                        return;
+                    }
                 }
+                mPressed = false;
             }
         }
     }
-    public void header() {
+    public void showSolution() {
+        StdDraw.clear(Color.BLACK);
         StdDraw.setPenColor(Color.DARK_GRAY);
         StdDraw.filledRectangle(width / 2, height + 0.5, width / 2, 0.5);
-        StdDraw.setFont(tileFont);
         StdDraw.setPenColor(Color.WHITE);
-        StdDraw.textLeft(1, height + 0.4, "Mines left: " + (minesTotal - minesMarked));
-        //StdDraw.textLeft(8, height + 0.4, "" + revealedTotal);
-        StdDraw.show();
-    }
-    public void showSolution() {
+        StdDraw.setFont(tileFont);
+        StdDraw.text(width / 2, height + 0.4, "Solution");
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Tile t = board[x][y];
-                if (t.visibility == 0) {
-                    t.visibility = 2;
+                if (t.visibility == 1) {
+                    StdDraw.setPenColor(unrevealedColor);
+                    StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
+                    if (t.mine) {
+                        drawFlag(x, y);
+                    } else {
+                        drawMine(x, y);
+                        StdDraw.setPenColor(Color.RED);
+                        StdDraw.line(x + 0.2, y + 0.2, x + 0.8, y + 0.8);
+                        StdDraw.line(x + 0.8, y + 0.2, x + 0.2, y + 0.8);
+                    }
+                } else {
+                    if (t.mine) {
+                        t.visibility = 2;
+                    }
                     drawTile(x, y);
-                } else if (t.visibility == 1 && !t.mine) {
-                    StdDraw.setPenColor(Color.RED);
-                    StdDraw.setPenRadius(0.005);
-                    StdDraw.line(x + 0.2, y + 0.2, x + 0.8, y + 0.8);
-                    StdDraw.line(x + 0.8, y + 0.2, x + 0.2, y + 0.8);
+                }
+            }
+        }
+        StdDraw.show();
+        boolean mPressed = false;
+        while (true) {
+            if (StdDraw.isMousePressed()) {
+                mPressed = true;
+            } else {
+                if (mPressed) {
+                    return;
+                } else {
+                    mPressed = false;
                 }
             }
         }
@@ -202,7 +305,20 @@ public class GameBoard {
                     StdDraw.setPenColor(unrevealedColor);
                     StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
                     StdDraw.setPenColor(Color.YELLOW);
-                    StdDraw.text(x + 0.5, y + 0.4, "☺");
+                    StdDraw.text(x + 0.5, y + 0.4, "\u263A");
+                }
+            }
+        }
+        StdDraw.show();
+        boolean mPressed = false;
+        while (true) {
+            if (StdDraw.isMousePressed()) {
+                mPressed = true;
+            } else {
+                if (mPressed) {
+                    return;
+                } else {
+                    mPressed = false;
                 }
             }
         }
@@ -211,11 +327,13 @@ public class GameBoard {
         this.width = w;
         this.height = h;
         this.minesTotal = m;
+        this.saved = true;
         StdDraw.setCanvasSize(width * TILE_SIZE, (height + 1) * TILE_SIZE);
         StdDraw.setXscale(0, width);
         StdDraw.setYscale(0, height + 1);
         StdDraw.enableDoubleBuffering();
         StdDraw.clear(Color.BLACK);
+        StdDraw.setPenRadius(0.005);
     }
     public void drawBoard() {
         for (int x = 0; x < width; x++) {
@@ -265,22 +383,26 @@ public class GameBoard {
     public void drawMine(int x, int y) {
         StdDraw.setPenColor(Color.BLACK);
         StdDraw.setFont(mineFont);
-        StdDraw.text(x + 0.5, y + 0.38, "⛯");
+        StdDraw.text(x + 0.5, y + 0.38, "\u26EF");
         StdDraw.filledCircle(x + 0.5, y + 0.5, 0.25);
     }
-    public void invertTile(int x, int y) {
+    public boolean invertTile(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            return;
+            return false;
         }
+        boolean changed = false;
         Tile t = board[x][y];
         if (t.visibility == 0) {
+            changed = true;
             t.visibility = 1;
             minesMarked++;
         } else if (t.visibility == 1) {
+            changed = true;
             t.visibility = 0;
             minesMarked--;
         }
         drawTile(x, y);
+        return changed;
     }
     public void safeFirstClick(int x, int y) {
         boolean success = false;
@@ -293,12 +415,14 @@ public class GameBoard {
         }
         firstClick = false;
     }
-    public void revealTile(int x, int y, boolean first) {
+    public boolean revealTile(int x, int y, boolean first) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            return;
+            return false;
         }
+        boolean changed = false;
         Tile t = board[x][y];
         if (t.visibility == 0) {
+            changed = true;
             t.visibility = 2;
             revealedTotal++;
             StdDraw.setPenColor(Color.GRAY);
@@ -314,24 +438,33 @@ public class GameBoard {
             drawTile(x, y);
         } else if (first && t.visibility == 2) {
             if (t.number > 0 && countFlags(x, y) == t.number) {
-                revealAround(x, y);
+                if (revealAround(x, y)) {
+                    changed = true;
+                }
             }
         }
+        return changed;
     }
-    public void revealAround(int x, int y) {
+    public boolean revealAround(int x, int y) {
+        boolean changed = false;
         if (mode.equals("Normal")) {
             for (int i = x - 1; i <= x + 1; i++) {
                 for (int j = y - 1; j <= y + 1; j++) {
-                    revealTile(i, j, false);
+                    if (revealTile(i, j, false)) {
+                        changed = true;
+                    }
                 }
             }
         } else if (mode.equals("Far")) {
             for (int i = x - 2; i <= x + 2; i++) {
                 for (int j = y - 2; j <= y + 2; j++) {
-                    revealTile(i, j, false);
+                    if (revealTile(i, j, false)) {
+                        changed = true;
+                    }
                 }
             }
         }
+        return changed;
     }
     public int countMines(int x, int y) {
         int total = 0;
