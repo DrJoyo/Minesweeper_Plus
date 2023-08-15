@@ -11,14 +11,16 @@ public class GameBoard implements Serializable {
     public static final Font tileFont = new Font("Dialog", Font.BOLD, 16);
     public static final Font smallTileFont = new Font("Dialog", Font.BOLD, 14);
     public static final Font mineFont = new Font("Dialog", Font.BOLD, 22);
-    public static final Font menuFont = new Font("Dialog", Font.BOLD, 40);
+    public static final Font gameOverFont = new Font("Dialog", Font.BOLD, 32);
+    public static final Font menuFont = new Font("Dialog", Font.BOLD, 48);
     public static final Color unrevealedColor = new Color(180, 180, 180, 255);
     public static final Color revealedColor = new Color(150, 150, 150, 255);
     public static final Color saveLoadColor = new Color(40, 40, 40);
     public static final Color loseColor = new Color(255, 0, 0, 50);
     public static final Color[] colorList = {Color.BLUE, new Color(0, 100, 0), Color.RED, new Color(0, 0, 80), new Color(80, 0, 0), new Color(0, 110, 110), Color.BLACK, Color.GRAY, new Color(64, 0, 128)};
-    private static final String[] difficultyList = {"Easy", "Medium", "Hard", "Extreme"};
-    public static final File SAVEFILE = Utils.join(new File(System.getProperty("user.dir")), "MinesweeperSaved.txt");
+    public static final String[] difficultyList = {"Easy", "Medium", "Hard", "Extreme", "Impossible"};
+    public static final Color[] difficultyColorList = {new Color(40, 150, 255), Color.GREEN, Color.YELLOW, new Color(255, 128, 0), Color.RED};
+    public static final File CWD = new File(System.getProperty("user.dir"));
     private int width;
     private int height;
     private int minesMarked;
@@ -51,8 +53,8 @@ public class GameBoard implements Serializable {
         this.height = h;
         this.minesMarked = 0;
         this.minesTotal = mineCount;
+        this.difficulty = difficulty;
         this.mode = mode;
-        board = new Tile[width][height];
     }
     public boolean mouseInBox(double x, double y, double halfWidth, double halfHeight) {
         double mouseX = StdDraw.mouseX();
@@ -60,9 +62,11 @@ public class GameBoard implements Serializable {
         return (x - halfWidth <= mouseX && y - halfHeight <= mouseY && mouseX <= x + halfWidth && mouseY <= y + halfHeight);
     }
     public void mainMenu() {
-        StdDraw.setCanvasSize(60 * TILE_SIZE, 31 * TILE_SIZE);
-        StdDraw.setXscale(0, 60);
-        StdDraw.setYscale(0, 31);
+        width = 30;
+        height = 20;
+        StdDraw.setCanvasSize(width * TILE_SIZE, (height + 1) * TILE_SIZE);
+        StdDraw.setXscale(0, width);
+        StdDraw.setYscale(0, height + 1);
         StdDraw.enableDoubleBuffering();
         renderMainMenu();
         boolean mPressed = false;
@@ -71,39 +75,45 @@ public class GameBoard implements Serializable {
                 mPressed = true;
             } else {
                 if (mPressed) {
-                    if (mouseInBox(30, 18, 5, 1)) {
-                        difficulty = (difficulty + 1) % 4;
-                        renderMainMenu();
-                    } else if (mouseInBox(30, 15, 5, 1)) {
-                        if (mode.equals("Normal")) {
-                            mode = "Far";
-                        } else if (mode.equals("Far")) {
-                            mode = "Normal";
-                        }
-                        renderMainMenu();
-                    } else if (mouseInBox(30, 12, 5, 1)) {
+                    if (mouseInBox(width / 2, height / 2 + 3, 5, 1)) {
                         int w = 0, h = 0, m = 0;
                         if (difficulty == 0) {
                             w = 10;
                             h = 10;
                             m = 10;
                         } else if (difficulty == 1) {
-                            w = 30;
-                            h = 20;
-                            m = 80;
+                            w = 16;
+                            h = 16;
+                            m = 40;
                         } else if (difficulty == 2) {
-                            w = 50;
-                            h = 25;
+                            w = 30;
+                            h = 16;
+                            m = 99;
+                        } else if (difficulty == 3) {
+                            w = 40;
+                            h = 22;
                             m = 200;
                         } else {
                             w = 60;
                             h = 30;
-                            m = 300;
+                            m = 500;
                         }
                         if (mode.equals("Far")) {
                             m = m * 3 / 4;
                         }
                         runGame(w, h, m);
+                    } else if (mouseInBox(width / 2, height / 2, 5, 1)) {
+                        difficulty = (difficulty + 1) % 5;
+                        renderMainMenu();
+                    } else if (mouseInBox(width / 2, height / 2 - 3, 5, 1)) {
+                        if (mode.equals("Normal")) {
+                            mode = "Far";
+                        } else if (mode.equals("Far")) {
+                            mode = "Normal";
+                        }
+                        renderMainMenu();
+                    } else if (mouseInBox(width / 2, height / 2 - 6, 5, 1)) {
+                        System.exit(0);
                     }
                 }
                 mPressed = false;
@@ -113,26 +123,30 @@ public class GameBoard implements Serializable {
     }
     public void renderMainMenu() {
         StdDraw.clear(Color.LIGHT_GRAY);
+        StdDraw.setPenColor(difficultyColorList[difficulty]);
+        StdDraw.filledRectangle(width / 2, height / 2, 5, 1);
         StdDraw.setPenColor(Color.GRAY);
-        StdDraw.filledRectangle(30, 18, 5, 1);
-        StdDraw.filledRectangle(30, 15, 5, 1);
-        StdDraw.filledRectangle(30, 12, 5, 1);
+        StdDraw.filledRectangle(width / 2, height / 2 + 3, 5, 1);
+        StdDraw.filledRectangle(width / 2, height / 2 - 3, 5, 1);
+        StdDraw.filledRectangle(width / 2, height / 2 - 6, 5, 1);
         StdDraw.setPenColor(Color.BLACK);
         StdDraw.setFont(menuFont);
-        StdDraw.text(30, 24, "Minesweeper Plus");
+        StdDraw.text(width / 2, height / 2 + 7, "Minesweeper Plus");
         StdDraw.setFont(tileFont);
-        StdDraw.text(30, 18, "Difficulty: " + difficultyList[difficulty]);
-        StdDraw.text(30, 15, "View: " + mode);
-        StdDraw.text(30, 12, "Start Game");
+        StdDraw.text(width / 2, height / 2 + 3, "Start Game");
+        StdDraw.text(width / 2, height / 2, "Difficulty: " + difficultyList[difficulty]);
+        StdDraw.text(width / 2, height / 2 - 3, "View: " + mode);
+        StdDraw.text(width / 2, height / 2 - 6, "Quit Game");
         StdDraw.setFont(mineFont);
         for (int i = 0; i < difficulty + 1; i++) {
-            StdDraw.text(36 + i, 17.88, "\u26EF");
-            StdDraw.filledCircle(36 + i, 18, 0.25);
+            StdDraw.text(width / 2 + 6 + i, height / 2 - 0.12, "\u26EF");
+            StdDraw.filledCircle(width / 2 + 6 + i, height / 2, 0.25);
         }
         StdDraw.show();
     }
     public void runGame(int w, int h, int m) {
         initialize(w, h, m);
+        board = new Tile[width][height];
         populateBoard(minesTotal);
         boolean mPressed = false;
         gameOver = false;
@@ -164,14 +178,27 @@ public class GameBoard implements Serializable {
                                 this.saved = false;
                             }
                             if (revealedTotal + minesTotal == width * height) {
+                                minesMarked = minesTotal;
                                 gameOver = true;
                             }
                         }
                     } else {
-                        if (mouseInBox(width - 5.5, height + 0.5, 1.5, 0.5)) {
-                            saveGame();
-                        } else if (mouseInBox(width - 1.5, height + 0.5, 1.5, 0.5)) {
-                            loadGame();
+                        if (difficulty > 0) {
+                            if (mouseInBox(width - 9.5, height + 0.5, 1.5, 0.5)) {
+                                saveGame();
+                            } else if (mouseInBox(width - 5.5, height + 0.5, 1.5, 0.5)) {
+                                loadGame();
+                            } else if (mouseInBox(width - 1.5, height + 0.5, 1.5, 0.5)) {
+                                mainMenu();
+                            }
+                        } else {
+                            if (mouseInBox(width - 6.5, height + 0.5, 1.125, 0.5)) {
+                                saveGame();
+                            } else if (mouseInBox(width - 3.75, height + 0.5, 1.125, 0.5)) {
+                                loadGame();
+                            } else if (mouseInBox(width - 1, height + 0.5, 1.125, 0.5)) {
+                                mainMenu();
+                            }
                         }
                     }
                     header();
@@ -192,33 +219,56 @@ public class GameBoard implements Serializable {
         StdDraw.setPenColor(Color.DARK_GRAY);
         StdDraw.filledRectangle(width / 2, height + 0.5, width / 2, 0.5);
         StdDraw.setPenColor(saveLoadColor);
-        StdDraw.filledRectangle(width - 1.5, height + 0.5, 1.5, 0.5);
-        StdDraw.filledRectangle(width - 5.5, height + 0.5, 1.5, 0.5);
+        if (difficulty > 0) {
+            StdDraw.filledRectangle(width - 1.5, height + 0.5, 1.5, 0.5);
+            StdDraw.filledRectangle(width - 5.5, height + 0.5, 1.5, 0.5);
+            StdDraw.filledRectangle(width - 9.5, height + 0.5, 1.5, 0.5);
+        } else {
+            StdDraw.filledRectangle(width - 1, height + 0.5, 1.125, 0.5);
+            StdDraw.filledRectangle(width - 3.75, height + 0.5, 1.125, 0.5);
+            StdDraw.filledRectangle(width - 6.5, height + 0.5, 1.125, 0.5);
+        }
         drawMine(0, height);
         StdDraw.setFont(tileFont);
         StdDraw.setPenColor(Color.WHITE);
         StdDraw.textLeft(1, height + 0.4, "" + (minesTotal - minesMarked));
-        StdDraw.text(width - 1.5, height + 0.4, "Load");
-        if (saved) {
-            StdDraw.text(width - 5.5, height + 0.4, "Save");
+        if (difficulty > 0) {
+            StdDraw.text(width - 1.5, height + 0.4, "Menu");
+            StdDraw.text(width - 5.5, height + 0.4, "Load");
+            if (saved) {
+                StdDraw.text(width - 9.5, height + 0.4, "Save");
+            } else {
+                StdDraw.text(width - 9.5, height + 0.4, "Save*");
+            }
         } else {
-            StdDraw.text(width - 5.5, height + 0.4, "Save*");
+            StdDraw.text(width - 1, height + 0.4, "Menu");
+            StdDraw.text(width - 3.75, height + 0.4, "Load");
+            if (saved) {
+                StdDraw.text(width - 6.5, height + 0.4, "Save");
+            } else {
+                StdDraw.text(width - 6.5, height + 0.4, "Save*");
+            }
         }
+
         //StdDraw.textLeft(8, height + 0.4, "" + testingNum);
     }
     public void saveGame() {
+        String saveString = difficultyList[difficulty] + mode + "Save.txt";
+        File saveFile = Utils.join(CWD, saveString);
         if (!this.saved) {
-            Utils.writeObject(SAVEFILE, this);
+            Utils.writeObject(saveFile, this);
             this.saved = true;
         }
     }
     public void loadGame() {
+        String saveString = difficultyList[difficulty] + mode + "Save.txt";
+        File saveFile = Utils.join(CWD, saveString);
         try {
-            GameBoard loaded = Utils.readObject(SAVEFILE, GameBoard.class);
+            GameBoard loaded = Utils.readObject(saveFile, GameBoard.class);
         } catch (Exception e) {
             return;
         }
-        GameBoard loaded = Utils.readObject(SAVEFILE, GameBoard.class);
+        GameBoard loaded = Utils.readObject(saveFile, GameBoard.class);
         this.width = loaded.width;
         this.height = loaded.height;
         this.minesMarked = loaded.minesMarked;
@@ -244,7 +294,7 @@ public class GameBoard implements Serializable {
         StdDraw.setFont(tileFont);
         StdDraw.text(width / 2, height / 2 + 0.9, "Main Menu");
         StdDraw.text(width / 2, height / 2 - 1.1, "Solution");
-        StdDraw.setFont(menuFont);
+        StdDraw.setFont(gameOverFont);
         StdDraw.text(width / 2, height / 2 + 3.4, "Game Over");
         StdDraw.show();
         boolean mPressed = false;
