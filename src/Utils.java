@@ -8,18 +8,12 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.List;
 
-
 /** Assorted utilities.
- *
- * Give this file a good read as it provides several useful utility functions
- * to save you some time.
+ * 
  *
  *  @author P. N. Hilfinger
  */
 class Utils {
-
-    /** The length of a complete SHA-1 UID as a hexadecimal numeral. */
-    static final int UID_LENGTH = 40;
 
     /* READING AND WRITING FILE CONTENTS */
 

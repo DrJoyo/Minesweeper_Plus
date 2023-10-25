@@ -8,18 +8,18 @@ import java.util.Random;
 
 public class GameBoard implements Serializable {
     public static final int TILE_SIZE = 20;
-    public static final Font tileFont = new Font("Dialog", Font.BOLD, 16);
-    public static final Font smallTileFont = new Font("Dialog", Font.BOLD, 14);
-    public static final Font mineFont = new Font("Dialog", Font.BOLD, 22);
-    public static final Font gameOverFont = new Font("Dialog", Font.BOLD, 32);
-    public static final Font menuFont = new Font("Dialog", Font.BOLD, 48);
-    public static final Color unrevealedColor = new Color(180, 180, 180, 255);
-    public static final Color revealedColor = new Color(150, 150, 150, 255);
-    public static final Color saveLoadColor = new Color(40, 40, 40);
-    public static final Color loseColor = new Color(255, 0, 0, 50);
-    public static final Color[] colorList = {Color.BLUE, new Color(0, 100, 0), Color.RED, new Color(0, 0, 80), new Color(80, 0, 0), new Color(0, 110, 110), Color.BLACK, Color.GRAY, new Color(64, 0, 128)};
-    public static final String[] difficultyList = {"Easy", "Medium", "Hard", "Extreme", "Impossible"};
-    public static final Color[] difficultyColorList = {new Color(40, 150, 255), Color.GREEN, Color.YELLOW, new Color(255, 128, 0), Color.RED};
+    public static final Font TILEFONT = new Font("Dialog", Font.BOLD, 16);
+    public static final Font SMALLTILEFONT = new Font("Dialog", Font.BOLD, 14);
+    public static final Font MINEFONT = new Font("Dialog", Font.BOLD, 22);
+    public static final Font GAMEOVERFONT = new Font("Dialog", Font.BOLD, 32);
+    public static final Font MENUFONT = new Font("Dialog", Font.BOLD, 48);
+    public static final Color UNREVEALEDCOLOR = new Color(180, 180, 180, 255);
+    public static final Color REVEALEDCOLOR = new Color(150, 150, 150, 255);
+    public static final Color SAVELOADCOLOR = new Color(40, 40, 40);
+    public static final Color LOSECOLOR = new Color(255, 0, 0, 50);
+    public static final Color[] COLORLIST = {Color.BLUE, new Color(0, 100, 0), Color.RED, new Color(0, 0, 80), new Color(80, 0, 0), new Color(0, 110, 110), Color.BLACK, Color.GRAY, new Color(64, 0, 128)};
+    public static final String[] DIFFICULTYLIST = {"Easy", "Medium", "Hard", "Extreme", "Impossible"};
+    public static final Color[] DIFFICULTYCOLORLIST = {new Color(40, 150, 255), Color.GREEN, Color.YELLOW, new Color(255, 128, 0), Color.RED};
     public static final File CWD = new File(System.getProperty("user.dir"));
     private int width;
     private int height;
@@ -34,6 +34,7 @@ public class GameBoard implements Serializable {
     private boolean firstClick;
     private int testingNum = 0;
     private boolean saved;
+    private boolean autosave;
     public class Tile implements Serializable {
         private int x;
         private int y;
@@ -55,6 +56,7 @@ public class GameBoard implements Serializable {
         this.minesTotal = mineCount;
         this.difficulty = difficulty;
         this.mode = mode;
+        this.autosave = true;
     }
     public boolean mouseInBox(double x, double y, double halfWidth, double halfHeight) {
         double mouseX = StdDraw.mouseX();
@@ -63,7 +65,7 @@ public class GameBoard implements Serializable {
     }
     public void mainMenu() {
         width = 30;
-        height = 20;
+        height = 24;
         StdDraw.setCanvasSize(width * TILE_SIZE, (height + 1) * TILE_SIZE);
         StdDraw.setXscale(0, width);
         StdDraw.setYscale(0, height + 1);
@@ -75,7 +77,7 @@ public class GameBoard implements Serializable {
                 mPressed = true;
             } else {
                 if (mPressed) {
-                    if (mouseInBox(width / 2, height / 2 + 3, 5, 1)) {
+                    if (mouseInBox(width / 2, height / 2 + 5, 5, 1)) {
                         int w = 0, h = 0, m = 0;
                         if (difficulty == 0) {
                             w = 10;
@@ -90,29 +92,32 @@ public class GameBoard implements Serializable {
                             h = 16;
                             m = 99;
                         } else if (difficulty == 3) {
-                            w = 40;
-                            h = 22;
-                            m = 200;
+                            w = 30;
+                            h = 24;
+                            m = 160;
                         } else {
-                            w = 60;
+                            w = 40;
                             h = 30;
-                            m = 500;
+                            m = 320;
                         }
                         if (mode.equals("Far")) {
                             m = m * 3 / 4;
                         }
                         runGame(w, h, m);
-                    } else if (mouseInBox(width / 2, height / 2, 5, 1)) {
+                    } else if (mouseInBox(width / 2, height / 2 + 2, 5, 1)) {
                         difficulty = (difficulty + 1) % 5;
                         renderMainMenu();
-                    } else if (mouseInBox(width / 2, height / 2 - 3, 5, 1)) {
+                    } else if (mouseInBox(width / 2, height / 2 - 1, 5, 1)) {
                         if (mode.equals("Normal")) {
                             mode = "Far";
                         } else if (mode.equals("Far")) {
                             mode = "Normal";
                         }
                         renderMainMenu();
-                    } else if (mouseInBox(width / 2, height / 2 - 6, 5, 1)) {
+                    } else if (mouseInBox(width / 2, height / 2 - 4, 5, 1)) {
+                        this.autosave = !this.autosave;
+                        renderMainMenu();
+                    } else if (mouseInBox(width / 2, height / 2 - 7, 5, 1)) {
                         System.exit(0);
                     }
                 }
@@ -123,24 +128,26 @@ public class GameBoard implements Serializable {
     }
     public void renderMainMenu() {
         StdDraw.clear(Color.LIGHT_GRAY);
-        StdDraw.setPenColor(difficultyColorList[difficulty]);
-        StdDraw.filledRectangle(width / 2, height / 2, 5, 1);
+        StdDraw.setPenColor(DIFFICULTYCOLORLIST[difficulty]);
+        StdDraw.filledRectangle(width / 2, height / 2 + 2, 5, 1);
         StdDraw.setPenColor(Color.GRAY);
-        StdDraw.filledRectangle(width / 2, height / 2 + 3, 5, 1);
-        StdDraw.filledRectangle(width / 2, height / 2 - 3, 5, 1);
-        StdDraw.filledRectangle(width / 2, height / 2 - 6, 5, 1);
+        StdDraw.filledRectangle(width / 2, height / 2 + 5, 5, 1);
+        StdDraw.filledRectangle(width / 2, height / 2 - 1, 5, 1);
+        StdDraw.filledRectangle(width / 2, height / 2 - 4, 5, 1);
+        StdDraw.filledRectangle(width / 2, height / 2 - 7, 5, 1);
         StdDraw.setPenColor(Color.BLACK);
-        StdDraw.setFont(menuFont);
-        StdDraw.text(width / 2, height / 2 + 7, "Minesweeper Plus");
-        StdDraw.setFont(tileFont);
-        StdDraw.text(width / 2, height / 2 + 3, "Start Game");
-        StdDraw.text(width / 2, height / 2, "Difficulty: " + difficultyList[difficulty]);
-        StdDraw.text(width / 2, height / 2 - 3, "View: " + mode);
-        StdDraw.text(width / 2, height / 2 - 6, "Quit Game");
-        StdDraw.setFont(mineFont);
+        StdDraw.setFont(MENUFONT);
+        StdDraw.text(width / 2, height / 2 + 9, "Minesweeper Plus");
+        StdDraw.setFont(TILEFONT);
+        StdDraw.text(width / 2, height / 2 + 5, "Start Game");
+        StdDraw.text(width / 2, height / 2 + 2, "Difficulty: " + DIFFICULTYLIST[difficulty]);
+        StdDraw.text(width / 2, height / 2 - 1, "View: " + mode);
+        StdDraw.text(width / 2, height / 2 - 4, "Autosave: " + autosave);
+        StdDraw.text(width / 2, height / 2 - 7, "Quit Game");
+        StdDraw.setFont(MINEFONT);
         for (int i = 0; i < difficulty + 1; i++) {
-            StdDraw.text(width / 2 + 6 + i, height / 2 - 0.12, "\u26EF");
-            StdDraw.filledCircle(width / 2 + 6 + i, height / 2, 0.25);
+            StdDraw.text(width / 2 + 6 + i, height / 2 + 1.88, "\u26EF");
+            StdDraw.filledCircle(width / 2 + 6 + i, height / 2 + 2, 0.25);
         }
         StdDraw.show();
     }
@@ -168,24 +175,44 @@ public class GameBoard implements Serializable {
                     if (y < height) {
                         if (StdDraw.isKeyPressed(KeyEvent.VK_SPACE)) {
                             if (invertTile(x, y)) {
-                                this.saved = false;
+                                if (autosave) {
+                                    saveGame();
+                                } else {
+                                    this.saved = false;
+                                }
+                            }
+                        } else if (StdDraw.isKeyPressed(KeyEvent.VK_H)) {
+                            if (hideTile(x, y)) {
+                                if (autosave) {
+                                    saveGame();
+                                } else {
+                                    this.saved = false;
+                                }
                             }
                         } else {
                             if (firstClick) {
                                 safeFirstClick(x, y);
                             }
                             if (revealTile(x, y, true)) {
-                                this.saved = false;
-                            }
-                            if (revealedTotal + minesTotal == width * height) {
-                                minesMarked = minesTotal;
-                                gameOver = true;
+                                if (revealedTotal + minesTotal == width * height) {
+                                    minesMarked = minesTotal;
+                                    gameOver = true;
+                                }
+                                if (autosave) {
+                                    if (!gameOver) {
+                                        saveGame();
+                                    }
+                                } else {
+                                    this.saved = false;
+                                }
                             }
                         }
                     } else {
                         if (difficulty > 0) {
                             if (mouseInBox(width - 9.5, height + 0.5, 1.5, 0.5)) {
-                                saveGame();
+                                if (!autosave && !saved) {
+                                    saveGame();
+                                }
                             } else if (mouseInBox(width - 5.5, height + 0.5, 1.5, 0.5)) {
                                 loadGame();
                             } else if (mouseInBox(width - 1.5, height + 0.5, 1.5, 0.5)) {
@@ -193,7 +220,9 @@ public class GameBoard implements Serializable {
                             }
                         } else {
                             if (mouseInBox(width - 6.5, height + 0.5, 1.125, 0.5)) {
-                                saveGame();
+                                if (!autosave && !saved) {
+                                    saveGame();
+                                }
                             } else if (mouseInBox(width - 3.75, height + 0.5, 1.125, 0.5)) {
                                 loadGame();
                             } else if (mouseInBox(width - 1, height + 0.5, 1.125, 0.5)) {
@@ -218,50 +247,55 @@ public class GameBoard implements Serializable {
     public void header() {
         StdDraw.setPenColor(Color.DARK_GRAY);
         StdDraw.filledRectangle(width / 2, height + 0.5, width / 2, 0.5);
-        StdDraw.setPenColor(saveLoadColor);
+        StdDraw.setPenColor(SAVELOADCOLOR);
         if (difficulty > 0) {
             StdDraw.filledRectangle(width - 1.5, height + 0.5, 1.5, 0.5);
             StdDraw.filledRectangle(width - 5.5, height + 0.5, 1.5, 0.5);
-            StdDraw.filledRectangle(width - 9.5, height + 0.5, 1.5, 0.5);
+            if (!autosave) {
+                StdDraw.filledRectangle(width - 9.5, height + 0.5, 1.5, 0.5);
+            }
         } else {
             StdDraw.filledRectangle(width - 1, height + 0.5, 1.125, 0.5);
             StdDraw.filledRectangle(width - 3.75, height + 0.5, 1.125, 0.5);
-            StdDraw.filledRectangle(width - 6.5, height + 0.5, 1.125, 0.5);
+            if (!autosave) {
+                StdDraw.filledRectangle(width - 6.5, height + 0.5, 1.125, 0.5);
+            }
         }
         drawMine(0, height);
-        StdDraw.setFont(tileFont);
+        StdDraw.setFont(TILEFONT);
         StdDraw.setPenColor(Color.WHITE);
         StdDraw.textLeft(1, height + 0.4, "" + (minesTotal - minesMarked));
         if (difficulty > 0) {
             StdDraw.text(width - 1.5, height + 0.4, "Menu");
             StdDraw.text(width - 5.5, height + 0.4, "Load");
-            if (saved) {
-                StdDraw.text(width - 9.5, height + 0.4, "Save");
-            } else {
-                StdDraw.text(width - 9.5, height + 0.4, "Save*");
+            if (!autosave) {
+                if (saved) {
+                    StdDraw.text(width - 9.5, height + 0.4, "Save");
+                } else {
+                    StdDraw.text(width - 9.5, height + 0.4, "Save*");
+                }
             }
         } else {
             StdDraw.text(width - 1, height + 0.4, "Menu");
             StdDraw.text(width - 3.75, height + 0.4, "Load");
-            if (saved) {
-                StdDraw.text(width - 6.5, height + 0.4, "Save");
-            } else {
-                StdDraw.text(width - 6.5, height + 0.4, "Save*");
+            if (!autosave) {
+                if (saved) {
+                    StdDraw.text(width - 6.5, height + 0.4, "Save");
+                } else {
+                    StdDraw.text(width - 6.5, height + 0.4, "Save*");
+                }
             }
         }
-
         //StdDraw.textLeft(8, height + 0.4, "" + testingNum);
     }
     public void saveGame() {
-        String saveString = difficultyList[difficulty] + mode + "Save.txt";
+        String saveString = DIFFICULTYLIST[difficulty] + mode + "Save.txt";
         File saveFile = Utils.join(CWD, saveString);
-        if (!this.saved) {
-            Utils.writeObject(saveFile, this);
-            this.saved = true;
-        }
+        Utils.writeObject(saveFile, this);
+        this.saved = true;
     }
     public void loadGame() {
-        String saveString = difficultyList[difficulty] + mode + "Save.txt";
+        String saveString = DIFFICULTYLIST[difficulty] + mode + "Save.txt";
         File saveFile = Utils.join(CWD, saveString);
         try {
             GameBoard loaded = Utils.readObject(saveFile, GameBoard.class);
@@ -286,15 +320,15 @@ public class GameBoard implements Serializable {
         StdDraw.show();
     }
     public void lostGame() {
-        StdDraw.clear(loseColor);
+        StdDraw.clear(LOSECOLOR);
         StdDraw.setPenColor(Color.DARK_GRAY);
         StdDraw.filledRectangle(width / 2, height / 2 + 1, 4, 0.5);
         StdDraw.filledRectangle(width / 2, height / 2 - 1, 4, 0.5);
         StdDraw.setPenColor(Color.WHITE);
-        StdDraw.setFont(tileFont);
+        StdDraw.setFont(TILEFONT);
         StdDraw.text(width / 2, height / 2 + 0.9, "Main Menu");
         StdDraw.text(width / 2, height / 2 - 1.1, "Solution");
-        StdDraw.setFont(gameOverFont);
+        StdDraw.setFont(GAMEOVERFONT);
         StdDraw.text(width / 2, height / 2 + 3.4, "Game Over");
         StdDraw.show();
         boolean mPressed = false;
@@ -320,13 +354,13 @@ public class GameBoard implements Serializable {
         StdDraw.setPenColor(Color.DARK_GRAY);
         StdDraw.filledRectangle(width / 2, height + 0.5, width / 2, 0.5);
         StdDraw.setPenColor(Color.WHITE);
-        StdDraw.setFont(tileFont);
+        StdDraw.setFont(TILEFONT);
         StdDraw.text(width / 2, height + 0.4, "Solution");
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Tile t = board[x][y];
                 if (t.visibility == 1) {
-                    StdDraw.setPenColor(unrevealedColor);
+                    StdDraw.setPenColor(UNREVEALEDCOLOR);
                     StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
                     if (t.mine) {
                         drawFlag(x, y);
@@ -360,12 +394,12 @@ public class GameBoard implements Serializable {
         }
     }
     public void wonGame() {
-        StdDraw.setFont(tileFont);
+        StdDraw.setFont(TILEFONT);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Tile t = board[x][y];
                 if (t.mine) {
-                    StdDraw.setPenColor(unrevealedColor);
+                    StdDraw.setPenColor(UNREVEALEDCOLOR);
                     StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
                     StdDraw.setPenColor(Color.YELLOW);
                     StdDraw.text(x + 0.5, y + 0.4, "\u263A");
@@ -412,25 +446,25 @@ public class GameBoard implements Serializable {
         }
         Tile t = board[x][y];
         if (t.visibility == 0) {
-            StdDraw.setPenColor(unrevealedColor);
+            StdDraw.setPenColor(UNREVEALEDCOLOR);
             StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
         } else if (t.visibility == 1) {
-            StdDraw.setPenColor(unrevealedColor);
+            StdDraw.setPenColor(UNREVEALEDCOLOR);
             StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
             drawFlag(x, y);
         } else {
-            StdDraw.setPenColor(revealedColor);
+            StdDraw.setPenColor(REVEALEDCOLOR);
             StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
             if (t.mine) {
                 drawMine(x, y);
             } else {
                 if (t.number > 0) {
                     if (t.number < 10) {
-                        StdDraw.setPenColor(colorList[t.number - 1]);
-                        StdDraw.setFont(tileFont);
+                        StdDraw.setPenColor(COLORLIST[t.number - 1]);
+                        StdDraw.setFont(TILEFONT);
                     } else {
                         StdDraw.setPenColor(Color.BLACK);
-                        StdDraw.setFont(smallTileFont);
+                        StdDraw.setFont(SMALLTILEFONT);
                     }
                     StdDraw.text(x + 0.5, y + 0.4, String.valueOf(t.number));
                 }
@@ -446,7 +480,7 @@ public class GameBoard implements Serializable {
     }
     public void drawMine(int x, int y) {
         StdDraw.setPenColor(Color.BLACK);
-        StdDraw.setFont(mineFont);
+        StdDraw.setFont(MINEFONT);
         StdDraw.text(x + 0.5, y + 0.38, "\u26EF");
         StdDraw.filledCircle(x + 0.5, y + 0.5, 0.25);
     }
@@ -464,6 +498,20 @@ public class GameBoard implements Serializable {
             changed = true;
             t.visibility = 0;
             minesMarked--;
+        }
+        drawTile(x, y);
+        return changed;
+    }
+    public boolean hideTile(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return false;
+        }
+        boolean changed = false;
+        Tile t = board[x][y];
+        if (t.visibility == 2) {
+            changed = true;
+            t.visibility = 0;
+            revealedTotal--;
         }
         drawTile(x, y);
         return changed;
