@@ -598,7 +598,6 @@ public class GameBoard implements Serializable {
         }
         return total;
     }
-
     public int countFlags(int x, int y) {
         int total = 0;
         if (mode.equals("Normal")) {

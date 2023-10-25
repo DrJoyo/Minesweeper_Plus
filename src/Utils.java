@@ -14,7 +14,6 @@ import java.util.List;
  *  @author P. N. Hilfinger
  */
 class Utils {
-
     /* READING AND WRITING FILE CONTENTS */
 
     /** Return the entire contents of FILE as a byte array.  FILE must
