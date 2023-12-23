@@ -5,19 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ad95a9f9-0b94-4ecc-9a4d-03591e166f41" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Minesweeper_Plus.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/untitled/untitled.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EasyFarSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/EasyFarSave.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImpossibleFarSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ImpossibleFarSave.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImpossibleNormalSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ImpossibleNormalSave.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameBoard$Tile.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameBoard$Tile.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameBoard.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameBoard.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Game.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ImpossiblePlusSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ImpossiblePlusSave.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Game.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -19,7 +19,7 @@ public class Game implements Serializable {
     public static final Color SAVELOADCOLOR = new Color(40, 40, 40);
     public static final Color LOSECOLOR = new Color(255, 0, 0, 50);
     public static final Color HIGHLIGHTCOLOR = new Color(255, 255, 0, 50);
-    public static final Color[] COLORLIST = {Color.BLUE, new Color(0, 100, 0), Color.RED, new Color(0, 0, 80), new Color(80, 0, 0), new Color(0, 110, 110), Color.BLACK, new Color(100, 100, 100), new Color(64, 0, 128), new Color(200, 170, 0), new Color(0, 60, 0), new Color(100, 50, 0), new Color(255, 120, 150), new Color(200, 100, 0), new Color(128, 0, 255), new Color(240, 240, 240)};
+    public static final Color[] COLORLIST = {Color.BLUE, new Color(0, 100, 0), Color.RED, new Color(0, 0, 80), new Color(80, 0, 0), new Color(0, 110, 110), Color.BLACK, new Color(100, 100, 100), new Color(64, 0, 128), new Color(255, 255, 0), new Color(0, 60, 0), new Color(100, 50, 0), new Color(255, 120, 150), new Color(200, 100, 0), new Color(128, 0, 255), new Color(240, 240, 240)};
     public static final String[] DIFFICULTYLIST = {"Easy", "Medium", "Hard", "Extreme", "Impossible"};
     public static final Color[] DIFFICULTYCOLORLIST = {new Color(40, 150, 255), Color.GREEN, Color.YELLOW, new Color(255, 128, 0), Color.RED};
     public static final File CWD = new File(System.getProperty("user.dir"));
@@ -340,7 +340,6 @@ public class Game implements Serializable {
         }
         drawMine(0, height);
         StdDraw.setPenColor(Color.WHITE);
-
         if (difficulty > 1) {
             StdDraw.setFont(TILEFONT);
             StdDraw.textLeft(3.25, height + 0.4, "Time: " + totalSeconds);
