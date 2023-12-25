@@ -4,10 +4,9 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
-public class Game implements Serializable {
+public class GameAxes implements Serializable {
     public static final int TILE_SIZE = 22;
     public static final Font TILEFONT = new Font("Dialog", Font.BOLD, 16);
     public static final Font SMALLTILEFONT = new Font("Dialog", Font.BOLD, 14);
@@ -60,10 +59,10 @@ public class Game implements Serializable {
         }
     }
     public static void main(String[] args) {
-        Game g = new Game(30, 24, 100, 0, "Plus");
-        g.startGame();
+        GameAxes g = new GameAxes(30, 24, 100, 0, "Plus");
+        g.startGame(); // runs game
     }
-    public Game(int w, int h, int mineCount, int difficulty, String mode) {
+    public GameAxes(int w, int h, int mineCount, int difficulty, String mode) {
         this.width = w;
         this.height = h;
         this.minesMarked = 0;
@@ -103,7 +102,7 @@ public class Game implements Serializable {
             StdDraw.clear(BACKGROUNDCOLOR);
             drawBoard();
             header();
-            if (mouseX < width && mouseY < height && board[mouseX][mouseY].visibility == 2) {
+            if (mouseX > 0 && mouseY > 0 && mouseX <= width && mouseY <= height && board[mouseX-1][mouseY-1].visibility == 2) {
                 StdDraw.setPenColor(HIGHLIGHTCOLOR);
                 if (mode.equals("Normal")) {
                     StdDraw.filledRectangle(mouseX + 0.5, mouseY + 0.5, 1.5, 1.5);
@@ -146,11 +145,11 @@ public class Game implements Serializable {
                             } else if (difficulty == 3) {
                                 w = 30;
                                 h = 24;
-                                m = 155;
+                                m = 160;
                             } else {
                                 w = 40;
                                 h = 30;
-                                m = 270;
+                                m = 280;
                             }
                         } else {
                             if (difficulty == 0) {
@@ -289,13 +288,14 @@ public class Game implements Serializable {
         header();
         StdDraw.show();
         while (!gameOver) {
+            testingNum++;
             if (StdDraw.isMousePressed()) {
                 mPressed = true;
             } else {
                 if (mPressed) {
                     int x = (int) StdDraw.mouseX();
                     int y = (int) StdDraw.mouseY();
-                    if (y < height) {
+                    if (y <= height) {
                         if (StdDraw.isKeyPressed(KeyEvent.VK_SPACE)) {
                             if (invertTile(x, y)) {
                                 if (autosave) {
@@ -334,6 +334,8 @@ public class Game implements Serializable {
                             }
                         }
                     } else {
+                        int width = this.width + 1;
+                        int height = this.height + 1;
                         if (difficulty > 1) {
 //                            if (mouseInBox(width - 9.5, height + 0.5, 1.5, 0.5)) {
 //                                if (!autosave && !saved) {
@@ -391,6 +393,8 @@ public class Game implements Serializable {
         return;
     }
     public void header() {
+        int width = this.width + 1;
+        int height = this.height + 1;
         StdDraw.setPenColor(Color.DARK_GRAY);
         StdDraw.filledRectangle(width / 2, height + 0.5, width / 2, 0.5);
         StdDraw.setPenColor(SAVELOADCOLOR);
@@ -463,11 +467,11 @@ public class Game implements Serializable {
         String saveString = DIFFICULTYLIST[difficulty] + mode + "Save.txt";
         File saveFile = Utils.join(CWD, saveString);
         try {
-            Game loaded = Utils.readObject(saveFile, Game.class);
+            GameAxes loaded = Utils.readObject(saveFile, GameAxes.class);
         } catch (Exception e) {
             return;
         }
-        Game loaded = Utils.readObject(saveFile, Game.class);
+        GameAxes loaded = Utils.readObject(saveFile, GameAxes.class);
         this.width = loaded.width;
         this.height = loaded.height;
         this.minesMarked = loaded.minesMarked;
@@ -521,13 +525,13 @@ public class Game implements Serializable {
     public void showSolution() {
         StdDraw.clear(BACKGROUNDCOLOR);
         StdDraw.setPenColor(Color.DARK_GRAY);
-        StdDraw.filledRectangle(width / 2, height + 0.5, width / 2, 0.5);
+        StdDraw.filledRectangle(width / 2, height + 1.5, width / 2 + 1, 0.5);
         StdDraw.setPenColor(Color.WHITE);
         StdDraw.setFont(TILEFONT);
-        StdDraw.text(width / 2, height + 0.4, "Solution");
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Tile t = board[x][y];
+        StdDraw.text(width / 2, height + 1.4, "Solution");
+        for (int x = 1; x <= width; x++) {
+            for (int y = 1; y <= height; y++) {
+                Tile t = board[x-1][y-1];
                 if (t.visibility == 1) {
                     StdDraw.setPenColor(UNREVEALEDCOLOR);
                     StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
@@ -575,9 +579,9 @@ public class Game implements Serializable {
             Utils.writeObject(saveFile, highscores);
         }
         StdDraw.setFont(TILEFONT);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Tile t = board[x][y];
+        for (int x = 1; x <= width; x++) {
+            for (int y = 1; y <= height; y++) {
+                Tile t = board[x-1][y-1];
                 if (t.mine) {
                     StdDraw.setPenColor(UNREVEALEDCOLOR);
                     StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
@@ -606,25 +610,33 @@ public class Game implements Serializable {
         this.height = h;
         this.minesTotal = m;
         this.saved = true;
-        StdDraw.setCanvasSize(width * TILE_SIZE, (height + 1) * TILE_SIZE);
-        StdDraw.setXscale(0, width);
-        StdDraw.setYscale(0, height + 1);
+        StdDraw.setCanvasSize((width + 1) * TILE_SIZE, (height + 2) * TILE_SIZE);
+        StdDraw.setXscale(0, width + 1);
+        StdDraw.setYscale(0, height + 2);
         StdDraw.enableDoubleBuffering();
         StdDraw.clear(BACKGROUNDCOLOR);
         StdDraw.setPenRadius(0.005);
     }
     public void drawBoard() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 1; x <= width; x++) {
+            for (int y = 1; y <= height; y++) {
                 drawTile(x, y);
             }
         }
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.setFont(SMALLTILEFONT);
+        for (int x = 5; x <= width; x += 5) {
+            StdDraw.text(x + 0.5, 0.5, "" + x);
+        }
+        for (int y = 5; y <= height; y += 5) {
+            StdDraw.text(0.5, y + 0.5, "" + y);
+        }
     }
     public void drawTile(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
+        if (x < 0 || x >= width + 1 || y < 0 || y >= height + 1) {
             return;
         }
-        Tile t = board[x][y];
+        Tile t = board[x-1][y-1];
         if (t.visibility == 0) {
             StdDraw.setPenColor(UNREVEALEDCOLOR);
             StdDraw.filledRectangle(x + 0.5, y + 0.5, 0.45, 0.45);
@@ -682,11 +694,11 @@ public class Game implements Serializable {
         StdDraw.filledCircle(x + 0.5, y + 0.5, 0.25);
     }
     public boolean invertTile(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
+        if (x <= 0 || x > width || y <= 0 || y > height) {
             return false;
         }
         boolean changed = false;
-        Tile t = board[x][y];
+        Tile t = board[x-1][y-1];
         if (t.visibility == 0) {
             changed = true;
             t.visibility = 1;
@@ -700,11 +712,11 @@ public class Game implements Serializable {
         return changed;
     }
     public boolean hideTile(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
+        if (x <= 0 || x > width || y <= 0 || y > height) {
             return false;
         }
         boolean changed = false;
-        Tile t = board[x][y];
+        Tile t = board[x-1][y-1];
         if (t.visibility == 2 & !t.mine) {
             changed = true;
             t.visibility = 0;
@@ -724,11 +736,11 @@ public class Game implements Serializable {
         firstClick = false;
     }
     public boolean revealTile(int x, int y, boolean first) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
+        if (x < 1 || x > width || y < 1 || y > height) {
             return false;
         }
         boolean changed = false;
-        Tile t = board[x][y];
+        Tile t = board[x-1][y-1];
         if (t.visibility == 0) {
             if (t.mine) {
                 mistakes++;
@@ -844,107 +856,41 @@ public class Game implements Serializable {
     }
     public boolean checkImpossibleBoard() {
         if (mode.equals("Normal")) {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (checkImpossible2x2Normal(x, y) || checkImpossible1x2Normal(x, y) ||checkImpossible2x1Normal(x, y)) {
-                        return true;
-                    }
+            return false;
+        }
+        for (int x = 1; x <= width - 1; x++) {
+            for (int y = 1; y <= height - 1; y++) {
+                if (checkImpossibleSpot(x, y)) {
+                    return true;
                 }
             }
-            return false;
-        } else {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (checkImpossible2x2Plus(x, y) || checkImpossible1x2Plus(x, y) ||checkImpossible2x1Plus(x, y)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-    }
-    public boolean checkImpossible2x2Normal(int x, int y) {
-        if (x >= width - 1 || y >= height - 1) {
-            return false;
-        }
-        if ((mineAt(x, y) && mineAt(x + 1, y + 1) && !mineAt(x + 1, y) && !mineAt(x, y + 1))
-                || (!mineAt(x, y) && !mineAt(x + 1, y + 1) && mineAt(x + 1, y) && mineAt(x, y + 1))) {
-            return mineOrOut(x - 1, y - 1) && mineOrOut(x + 2, y - 1) && mineOrOut(x - 1, y + 2) && mineOrOut(x + 2, y + 2);
         }
         return false;
     }
-    public boolean checkImpossible1x2Normal(int x, int y) {
-        if (x >= width - 1 || y >= height) {
-            return false;
-        }
-        if ((mineAt(x, y) && !mineAt(x + 1, y))
-                || (!mineAt(x, y) && mineAt(x + 1, y))) {
-            return mineOrOut(x - 1, y - 1) && mineOrOut(x - 1, y) && mineOrOut(x - 1, y + 1)
-                    && mineOrOut(x + 2, y - 1) && mineOrOut(x + 2, y) && mineOrOut(x + 2, y + 1);
-        }
-        return false;
-    }
-    public boolean checkImpossible2x1Normal(int x, int y) {
-        if (x >= width || y >= height - 1) {
-            return false;
-        }
-        if ((mineAt(x, y) && !mineAt(x, y + 1))
-                || (!mineAt(x, y) && mineAt(x, y + 1))) {
-            return mineOrOut(x - 1, y - 1) && mineOrOut(x, y - 1) && mineOrOut(x + 1, y - 1)
-                    && mineOrOut(x - 1, y + 2) && mineOrOut(x, y + 2) && mineOrOut(x + 1, y + 2);
-        }
-        return false;
-    }
-    public boolean checkImpossible2x2Plus(int x, int y) {
-        if (x >= width - 1 || y >= height - 1) {
-            return false;
-        }
+    public boolean checkImpossibleSpot(int x, int y) {
         if ((mineAt(x, y) && mineAt(x + 1, y + 1) && !mineAt(x + 1, y) && !mineAt(x, y + 1))
                 || (!mineAt(x, y) && !mineAt(x + 1, y + 1) && mineAt(x + 1, y) && mineAt(x, y + 1))) {
             return mineOrOut(x - 2, y - 2) && mineOrOut(x + 3, y - 2) && mineOrOut(x - 2, y + 3) && mineOrOut(x + 3, y + 3);
         }
         return false;
     }
-    public boolean checkImpossible1x2Plus(int x, int y) {
-        if (x >= width - 1 || y >= height) {
-            return false;
-        }
-        if ((mineAt(x, y) && !mineAt(x + 1, y))
-                || (!mineAt(x, y) && mineAt(x + 1, y))) {
-            return mineOrOut(x - 2, y - 2) && mineOrOut(x - 2, y - 1) && mineOrOut(x - 2, y) && mineOrOut(x - 2, y + 1) && mineOrOut(x - 2, y + 2)
-                    && mineOrOut(x + 3, y - 2) && mineOrOut(x + 3, y - 1) && mineOrOut(x + 3, y) && mineOrOut(x + 3, y + 1) && mineOrOut(x + 3, y + 2);
-        }
-        return false;
-    }
-    public boolean checkImpossible2x1Plus(int x, int y) {
-        if (x >= width || y >= height - 1) {
-            return false;
-        }
-        if ((mineAt(x, y) && !mineAt(x, y + 1))
-                || (!mineAt(x, y) && mineAt(x, y + 1))) {
-            return mineOrOut(x - 2, y - 2) && mineOrOut(x - 1, y - 2) && mineOrOut(x, y - 2) && mineOrOut(x + 1, y - 2) && mineOrOut(x + 2, y - 2)
-                    && mineOrOut(x - 2, y + 3) && mineOrOut(x - 1, y + 3) && mineOrOut(x, y + 3) && mineOrOut(x + 1, y + 3) && mineOrOut(x + 2, y + 3);
-        }
-        return false;
-    }
-
     public boolean mineAt(int x, int y) {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            return board[x][y].mine;
+        if (x > 0 && x <= width && y > 0 && y <= height) {
+            return board[x-1][y-1].mine;
         } else {
             return false;
         }
     }
     public boolean mineOrOut(int x, int y) {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            return board[x][y].mine;
+        if (x > 0 && x <= width && y > 0 && y <= height) {
+            return board[x-1][y-1].mine;
         } else {
-            return true;
+            return false;
         }
     }
     public boolean flagAt(int x, int y) {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            return (board[x][y].visibility == 1);
+        if (x > 0 && x <= width && y > 0 && y <= height) {
+            return (board[x-1][y-1].visibility == 1);
         } else {
             return false;
         }
