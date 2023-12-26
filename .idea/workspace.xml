@@ -6,27 +6,23 @@
   <component name="ChangeListManager">
     <list default="true" id="ad95a9f9-0b94-4ecc-9a4d-03591e166f41" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EasyNormalSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/EasyNormalSave.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EasyPlusSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/EasyPlusSave.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HardNormalSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/HardNormalSave.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HardPlusSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/HardPlusSave.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImpossibleNormalSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ImpossibleNormalSave.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImpossiblePlusSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ImpossiblePlusSave.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/EasyNormalSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/EasyPlusSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game$Tile.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Game.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/EasyFarSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/EasyNormalSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/EasyPlusSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExtremeFarSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExtremeNormalSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExtremePlusSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HardFarSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HardNormalSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HardPlusSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Highscores.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ImpossibleFarSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ImpossibleNormalSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ImpossiblePlusSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MediumFarSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MediumNormalSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MediumPlusSave.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Game.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameBoard$Tile.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameBoard.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ImpossibleFarSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ImpossiblePlusSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MediumFarSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MediumPlusSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/StdDraw$RetinaImageIcon.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/StdDraw.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
