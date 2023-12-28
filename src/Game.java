@@ -104,7 +104,7 @@ public class Game implements Serializable {
                 saveHighscore();
             }
         } catch (Exception e) {
-            highscores = new int[]{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+            highscores = new int[]{10, -1, 204, -1, -1, 7, 83, 369, -1, 2636, 46, -1, -1, -1, 4672};
             Utils.writeObject(saveFile, highscores);
         }
     }
@@ -283,13 +283,13 @@ public class Game implements Serializable {
     public void runGame(int w, int h, int m) {
         initialize(w, h, m);
         board = new Tile[width][height];
-        populateBoard(minesTotal);
         boolean mPressed = false;
         gameOver = false;
         firstClick = true;
         testingNum = 0;
         revealedTotal = 0;
         minesMarked = 0;
+        populateBoard(0, 0, 0);
         drawBoard();
         header();
         StdDraw.show();
@@ -319,7 +319,8 @@ public class Game implements Serializable {
                             }
                         } else {
                             if (firstClick) {
-                                safeFirstClick(x, y);
+                                populateBoard(x, y, minesTotal);
+                                firstClick = false;
                                 this.startTime = System.currentTimeMillis();
                                 this.totalSeconds = 0;
                                 this.loadSeconds = 0;
@@ -784,7 +785,7 @@ public class Game implements Serializable {
     public void safeFirstClick(int x, int y) {
         boolean success = false;
         while (!success) {
-            populateBoard(minesTotal);
+            populateBoard(x, y, minesTotal);
             if (countMines(x, y) == 0) {
                 success = true;
             }
@@ -863,16 +864,18 @@ public class Game implements Serializable {
         }
         return total;
     }
-    public void populateBoard(int mineCount) {
+    public void populateBoard(int x, int y, int mineCount) {
         ArrayList<Tile> tileArrayList;
         boolean impossible = true;
         while (impossible) {
             tileArrayList = new ArrayList<>();
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    Tile newTile = new Tile(x, y, false);
-                    board[x][y] = newTile;
-                    tileArrayList.add(newTile);
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    Tile newTile = new Tile(i, j, false);
+                    board[i][j] = newTile;
+                    if (!(x - 1 - mode <= i && i <= x + 1 + mode && y - 1 - mode <= j && j <= y + 1 + mode)) {
+                        tileArrayList.add(newTile);
+                    }
                 }
             }
             for (int i = 0; i < mineCount; i++) {

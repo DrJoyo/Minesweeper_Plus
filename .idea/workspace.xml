@@ -6,22 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="ad95a9f9-0b94-4ecc-9a4d-03591e166f41" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EasyFarSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EasyNormalSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EasyPlusSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExtremeFarSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExtremeNormalSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExtremePlusSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HardFarSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HardNormalSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HardPlusSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Highscores.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImpossibleFarSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImpossibleNormalSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImpossiblePlusSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MediumFarSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MediumNormalSave.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MediumPlusSave.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Savedata/EasyNormalSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Savedata/EasyNormalSave.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Savedata/ExtremePlusSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Savedata/ExtremePlusSave.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Savedata/Highscores.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Savedata/Highscores.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Savedata/ImpossibleDouble-PlusSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Savedata/ImpossibleDouble-PlusSave.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Savedata/ImpossibleNormalSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Savedata/ImpossibleNormalSave.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Savedata/ImpossiblePlusSave.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Savedata/ImpossiblePlusSave.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Game.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
