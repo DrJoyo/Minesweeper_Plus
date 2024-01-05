@@ -9,11 +9,11 @@ import java.util.Random;
 
 public class Game implements Serializable {
     public static final int TILE_SIZE = 22;
-    public static final Font TILEFONT = new Font("Dialog", Font.BOLD, 16);
-    public static final Font SMALLTILEFONT = new Font("Dialog", Font.BOLD, 14);
-    public static final Font MINEFONT = new Font("Dialog", Font.BOLD, 22);
-    public static final Font GAMEOVERFONT = new Font("Dialog", Font.BOLD, 32);
-    public static final Font MENUFONT = new Font("Dialog", Font.BOLD, 48);
+    public static final Font TILEFONT = new Font("Dialog", Font.BOLD, 16 * TILE_SIZE / 22);
+    public static final Font SMALLTILEFONT = new Font("Dialog", Font.BOLD, 14 * TILE_SIZE / 22);
+    public static final Font MINEFONT = new Font("Dialog", Font.BOLD, 22 * TILE_SIZE / 22);
+    public static final Font GAMEOVERFONT = new Font("Dialog", Font.BOLD, 32 * TILE_SIZE / 22);
+    public static final Font MENUFONT = new Font("Dialog", Font.BOLD, 48 * TILE_SIZE / 22);
     public static final Color BACKGROUNDCOLOR = Color.BLACK;
     public static final Color UNREVEALEDCOLOR = new Color(190, 190, 190, 255);
     public static final Color REVEALEDCOLOR = new Color(155, 155, 155, 255);
@@ -88,6 +88,7 @@ public class Game implements Serializable {
         this.totalSeconds = 0;
         this.mistakes = 0;
     }
+    /** Reads high scores from Highscores.txt */
     public void readHighscores() {
         File saveFile = Utils.join(SAVEDATA, "Highscores.txt");
         try {
@@ -104,10 +105,12 @@ public class Game implements Serializable {
                 saveHighscore();
             }
         } catch (Exception e) {
-            highscores = new int[]{10, -1, 204, -1, -1, 7, 83, 369, -1, 2636, 46, -1, -1, -1, 4672};
+            highscores = new int[]{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
             Utils.writeObject(saveFile, highscores);
         }
     }
+
+    /** Makes save folder if it doesn't exist, then opens the main menu */
     public void startGame() {
         if (!SAVEDATA.exists()) {
             SAVEDATA.mkdir();
@@ -117,23 +120,13 @@ public class Game implements Serializable {
             mainMenu();
         }
     }
+    /** Checks if the mouse is within specified bounds */
     public boolean mouseInBox(double x, double y, double halfWidth, double halfHeight) {
         double mouseX = StdDraw.mouseX();
         double mouseY = StdDraw.mouseY();
         return (x - halfWidth <= mouseX && y - halfHeight <= mouseY && mouseX <= x + halfWidth && mouseY <= y + halfHeight);
     }
-    public void drawHighlight() {
-        int mouseX = (int) StdDraw.mouseX();
-        int mouseY = (int) StdDraw.mouseY();
-        StdDraw.clear(BACKGROUNDCOLOR);
-        drawBoard();
-        header();
-        if (mouseX < width && mouseY < height && board[mouseX][mouseY].visibility == 2) {
-            StdDraw.setPenColor(HIGHLIGHTCOLOR);
-            StdDraw.filledRectangle(mouseX + 0.5, mouseY + 0.5, 1.5 + mode, 1.5 + mode);
-        }
-        StdDraw.show();
-    }
+
     public void mainMenu() {
         width = 30;
         height = 27;
@@ -211,6 +204,7 @@ public class Game implements Serializable {
                 String.format("%.3f", 1.0 * modeParam[3 * difficulty + 2] / (modeParam[3 * difficulty] * modeParam[3 * difficulty + 1])));
         StdDraw.show();
     }
+    /** A method to show what different number colors will look like in game */
     public void testNumberColors() {
         StdDraw.setPenColor(BACKGROUNDCOLOR);
         StdDraw.filledRectangle(COLORLIST.length / 2, height + 0.5, COLORLIST.length / 2 + 1, 0.5);
@@ -227,6 +221,7 @@ public class Game implements Serializable {
         }
 //        StdDraw.show();
     }
+    /** Shows all high scores, returns to main menu on click */
     public void highscoreScreen() {
         StdDraw.clear(Color.LIGHT_GRAY);
         StdDraw.setFont(MENUFONT);
@@ -280,6 +275,20 @@ public class Game implements Serializable {
             StdDraw.pause(PAUSETIME);
         }
     }
+    /** Draws a translucent yellow box around the selected tile, showing the area it covers */
+    public void drawHighlight() {
+        int mouseX = (int) StdDraw.mouseX();
+        int mouseY = (int) StdDraw.mouseY();
+        StdDraw.clear(BACKGROUNDCOLOR);
+        drawBoard();
+        header();
+        if (mouseX < width && mouseY < height && board[mouseX][mouseY].visibility == 2) {
+            StdDraw.setPenColor(HIGHLIGHTCOLOR);
+            StdDraw.filledRectangle(mouseX + 0.5, mouseY + 0.5, 1.5 + mode, 1.5 + mode);
+        }
+        StdDraw.show();
+    }
+    /** Main game loop */
     public void runGame(int w, int h, int m) {
         initialize(w, h, m);
         board = new Tile[width][height];
@@ -378,23 +387,6 @@ public class Game implements Serializable {
 
                                 }
                             }
-//                            if (revealTile(x, y, true)) {
-//                                if (revealedTotal + minesTotal == width * height) {
-//                                    minesMarked = minesTotal;
-//                                    gameOver = true;
-//                                }
-//                                if (autosave) {
-//                                    if (!gameOver) {
-//                                        saveGame();
-//                                    } else {
-//                                        loadGame();
-//                                        mistakes++;
-//                                        saveGame();
-//                                    }
-//                                } else {
-//                                    this.saved = false;
-//                                }
-//                            }
                         }
                     } else {
                         if (difficulty > 1) {
@@ -460,8 +452,8 @@ public class Game implements Serializable {
         } else {
             lostGame();
         }
-        return;
     }
+    /** Displays game information at the top of the screen */
     public void header() {
         StdDraw.setPenColor(Color.DARK_GRAY);
         StdDraw.filledRectangle(width / 2, height + 0.5, width / 2 + 1, 0.5);
@@ -525,16 +517,19 @@ public class Game implements Serializable {
         }
         //StdDraw.textLeft(8, height + 0.4, "" + testingNum);
     }
+    /** Writes the serialized game object to a file corresponding to the difficulty and mode */
     public void saveGame() {
         String saveString = DIFFICULTYLIST[difficulty] + MODELIST[mode] + "Save.txt";
         File saveFile = Utils.join(SAVEDATA, saveString);
         Utils.writeObject(saveFile, this);
         this.saved = true;
     }
+    /** Writes the serialized highscores array to Highscores.txt */
     public void saveHighscore() {
         File saveFile = Utils.join(SAVEDATA, "Highscores.txt");
         Utils.writeObject(saveFile, highscores);
     }
+    /** Reads and deserializes game object from the file corresponding to the difficulty and mode */
     public void loadGame() {
         String saveString = DIFFICULTYLIST[difficulty] + MODELIST[mode] + "Save.txt";
         File saveFile = Utils.join(SAVEDATA, saveString);
@@ -563,6 +558,7 @@ public class Game implements Serializable {
         header();
         StdDraw.show();
     }
+    /** Game Over screen */
     public void lostGame() {
         StdDraw.clear(LOSECOLOR);
         StdDraw.setPenColor(Color.DARK_GRAY);
@@ -593,6 +589,7 @@ public class Game implements Serializable {
             StdDraw.pause(PAUSETIME);
         }
     }
+    /** Shows location of all mines and incorrect flags on the screen */
     public void showSolution() {
         StdDraw.clear(BACKGROUNDCOLOR);
         StdDraw.setPenColor(Color.DARK_GRAY);
@@ -637,6 +634,7 @@ public class Game implements Serializable {
             StdDraw.pause(PAUSETIME);
         }
     }
+    /** Turns all mines (which should all be flagged) into smiley faces */
     public void wonGame() {
         int gameIndex = 5 * mode + difficulty;
         if (mistakes == 0 && (highscores[gameIndex] < 0 || totalSeconds < highscores[gameIndex])) {
@@ -682,6 +680,7 @@ public class Game implements Serializable {
         StdDraw.clear(BACKGROUNDCOLOR);
         StdDraw.setPenRadius(0.005);
     }
+    /** Renders all tiles on the board */
     public void drawBoard() {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -689,6 +688,7 @@ public class Game implements Serializable {
             }
         }
     }
+    /** Renders a single tile, showing either an unrevealed tile, a flag, or a number/mine */
     public void drawTile(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             return;
@@ -750,6 +750,7 @@ public class Game implements Serializable {
         StdDraw.text(x + 0.5, y + 0.38, "\u26EF");
         StdDraw.filledCircle(x + 0.5, y + 0.5, 0.25);
     }
+    /** Switches a tile between flagged and unflagged. Does nothing to revealed tiles */
     public boolean invertTile(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             return false;
@@ -768,6 +769,7 @@ public class Game implements Serializable {
         drawTile(x, y);
         return changed;
     }
+    /** Unreveals a revealed tile */
     public boolean hideTile(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             return false;
@@ -782,16 +784,18 @@ public class Game implements Serializable {
         drawTile(x, y);
         return changed;
     }
-    public void safeFirstClick(int x, int y) {
-        boolean success = false;
-        while (!success) {
-            populateBoard(x, y, minesTotal);
-            if (countMines(x, y) == 0) {
-                success = true;
-            }
-        }
-        firstClick = false;
-    }
+    /** Used in old, slower mine generation algorithm */
+//    public void safeFirstClick(int x, int y) {
+//        boolean success = false;
+//        while (!success) {
+//            populateBoard(x, y, minesTotal);
+//            if (countMines(x, y) == 0) {
+//                success = true;
+//            }
+//        }
+//        firstClick = false;
+//    }
+    /** Reveals a tile. If tile has a mine, sets gameOver to true. Otherwise, counts nearby mines. */
     public boolean revealTile(Tile t, boolean first) {
 //        if (x < 0 || x >= width || y < 0 || y >= height) {
 //            return false;
@@ -829,6 +833,7 @@ public class Game implements Serializable {
 //        }
         return changed;
     }
+    /** Reveals all nearby tiles when a number tile is directly clicked if sufficient nearby tiles are flagged */
     public ArrayList<Tile> revealAround(int x, int y) {
         ArrayList<Tile> toChange = new ArrayList<>();
         int xUpper = Math.min(width - 1, x + 1 + mode);
@@ -842,6 +847,7 @@ public class Game implements Serializable {
         }
         return toChange;
     }
+    /** Counts how many mines are nearby */
     public int countMines(int x, int y) {
         int total = 0;
         for (int i = x - 1 - mode; i <= x + 1 + mode; i++) {
@@ -864,6 +870,7 @@ public class Game implements Serializable {
         }
         return total;
     }
+    /** Mine generation algorithm */
     public void populateBoard(int x, int y, int mineCount) {
         ArrayList<Tile> tileArrayList;
         boolean impossible = true;
@@ -883,27 +890,18 @@ public class Game implements Serializable {
                 Tile toPlant = tileArrayList.remove(index);
                 toPlant.mine = true;
             }
-            if (!checkImpossibleBoard()) {
+            if (mineCount == 0 || !checkImpossibleBoard()) {
                 impossible = false;
             }
 //            testingNum++;
         }
     }
+    /** The following methods are used to reduce the likelihood of impossible situations in games */
     public boolean checkImpossibleBoard() {
-        if (mode < 2) {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (checkImpossible2x2(x, y) || checkImpossible1x2(x, y) ||checkImpossible2x1(x, y)) {
-                        return true;
-                    }
-                }
-            }
-        } else {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (checkImpossible2x2(x, y)) {
-                        return true;
-                    }
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (checkImpossible2x2(x, y) || checkImpossible1x2(x, y) || checkImpossible2x1(x, y) || checkImpossible1x5(x, y) || checkImpossible5x1(x, y)) {
+                    return true;
                 }
             }
         }
@@ -960,7 +958,48 @@ public class Game implements Serializable {
         }
         return false;
     }
-
+    public boolean checkImpossible1x5(int x, int y) {
+        if (x >= width - 4 - 2*mode || y >= height) {
+            return false;
+        }
+        if ((mineAt(x, y) && !mineAt(x + 1, y) && (mineAt(x + 2*mode + 3, y) && !mineAt(x + 2*mode + 4, y)))
+                || (!mineAt(x, y) && mineAt(x + 1, y) && !mineAt(x + 2*mode + 3, y) && mineAt(x + 2*mode + 4, y))) {
+            boolean imposs = true;
+            for (int i = y - 1 - mode; i <= y + 1 + mode; i++) {
+                if (!mineOrOut(x - 1 - mode, i)) {
+                    imposs = false;
+                }
+            }
+            for (int i = y - 1 - mode; i <= y + 1 + mode; i++) {
+                if (!mineOrOut(x + 5 + 3*mode, i)) {
+                    imposs = false;
+                }
+            }
+            return imposs;
+        }
+        return false;
+    }
+    public boolean checkImpossible5x1(int x, int y) {
+        if (x >= width || y >= height - 4 - 2*mode) {
+            return false;
+        }
+        if ((mineAt(x, y) && !mineAt(x, y + 1) && mineAt(x, y + 2*mode + 3) && !mineAt(x, y + 2*mode + 4))
+                || (!mineAt(x, y) && mineAt(x, y + 1) && !mineAt(x, y + 2*mode + 3) && mineAt(x, y + 2*mode + 4))) {
+            boolean imposs = true;
+            for (int i = x - 1 - mode; i <= x + 1 + mode; i++) {
+                if (!mineOrOut(i, y - 1 - mode)) {
+                    imposs = false;
+                }
+            }
+            for (int i = x - 1 - mode; i <= x + 1 + mode; i++) {
+                if (!mineOrOut(i, y + 5 + 3*mode)) {
+                    imposs = false;
+                }
+            }
+            return imposs;
+        }
+        return false;
+    }
     public boolean mineAt(int x, int y) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             return board[x][y].mine;
